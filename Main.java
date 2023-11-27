@@ -6,10 +6,31 @@ public class Main {
 
     HashMap<String, Integer> distancesMap = new HashMap<>();
 
+    int prevLevel = 0;
+
+    private static Set<String> exploredPermutations = new HashSet<>();
+
+    private static boolean areEquivalent(String[] code, int level) {
+        // Convert the code array to a string for easy comparison
+        String currentPermutation = Arrays.toString(Arrays.copyOfRange(code, 0, level + 1));
+
+        // Check if the current permutation has been explored before
+        if (exploredPermutations.contains(currentPermutation)) {
+            return true; // The current permutation is equivalent to a previously explored one
+        } else {
+            // If not, add the current permutation to the set of explored permutations
+            exploredPermutations.add(currentPermutation);
+            return false; // The current permutation is not equivalent to any previous one
+        }
+    }
+
     public void backtrack(String[] code, List<String>[] candidates, int level, int M, int d) {
         if (level >= M) {
             return;
         }
+
+        if (level < prevLevel) return;
+        prevLevel = level;
 
         try {
             for (String v : candidates[level]) {
@@ -82,10 +103,10 @@ public class Main {
     public static void main(String[] args) {
         Main test = new Main();
 
-        int n = 3;
-        int d = 2;
+        int n = 8;
+        int d = 4;
         int q = 2;
-        int M = 2;
+        int M = 10;
 
         String[] code = new String[M];
         List<String>[] candidates = new List[M + 1];
