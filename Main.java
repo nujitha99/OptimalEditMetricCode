@@ -4,33 +4,17 @@ import java.util.*;
 
 public class Main {
 
-    HashMap<String, Integer> distancesMap = new HashMap<>();
-
     int prevLevel = 0;
-
-    private static Set<String> exploredPermutations = new HashSet<>();
-
-    private static boolean areEquivalent(String[] code, int level) {
-        // Convert the code array to a string for easy comparison
-        String currentPermutation = Arrays.toString(Arrays.copyOfRange(code, 0, level + 1));
-
-        // Check if the current permutation has been explored before
-        if (exploredPermutations.contains(currentPermutation)) {
-            return true; // The current permutation is equivalent to a previously explored one
-        } else {
-            // If not, add the current permutation to the set of explored permutations
-            exploredPermutations.add(currentPermutation);
-            return false; // The current permutation is not equivalent to any previous one
-        }
-    }
+    List<List<String>> foundCodes = new ArrayList<List<String>>();
+    HashMap<String, Integer> distancesMap = new HashMap<>();
 
     public void backtrack(String[] code, List<String>[] candidates, int level, int M, int d) {
         if (level >= M) {
             return;
         }
 
-        if (level < prevLevel) return;
         prevLevel = level;
+
 
         try {
             for (String v : candidates[level]) {
@@ -40,6 +24,10 @@ public class Main {
                     if (distancesMap.get(w+v) >= d) {
                         candidates[level + 1].add(w);
                     }
+                }
+                if (level < prevLevel) {
+                    foundCodes.add(Arrays.asList(code));
+                    if (foundCodes.size() == 2) checkGeneratedCodes(code);
                 }
                 backtrack(code, candidates, level + 1, M, d);
             }
@@ -100,13 +88,31 @@ public class Main {
         }
     }
 
+    private void checkGeneratedCodes(String[] code) {
+        if (Arrays.asList(code).contains(null)) {
+            int counter = (int) Arrays.stream(code).filter(Objects::nonNull).count();
+            System.out.println("(" + n + ", " + d + ")" + q + " code with more than "
+                    + counter + " codewords cannot exist");
+        } else {
+            System.out.println("A valid code exists: ");
+//            for (int i = code.length-1; i >= 0; i--) {
+//                System.out.print(code[i] + " ");
+//            }
+            for (String codew :
+                    code) {
+                System.out.print(codew + " ");
+            }
+        }
+        System.exit(0);
+    }
+
+    static int  n = 10;
+    static int d = 2;
+    static int q = 2;
+    static int M = 520;
+
     public static void main(String[] args) {
         Main test = new Main();
-
-        int n = 8;
-        int d = 4;
-        int q = 2;
-        int M = 10;
 
         String[] code = new String[M];
         List<String>[] candidates = new List[M + 1];
@@ -118,15 +124,6 @@ public class Main {
 
         test.backtrack(code, candidates, 0, M, d);
 
-        if (Arrays.asList(code).contains(null)) {
-            int counter = (int) Arrays.stream(code).filter(Objects::nonNull).count();
-            System.out.println("(" + n + ", " + d + ")" + q + " code with more than "
-                    + counter + " codewords cannot exist");
-        } else {
-            System.out.println("A valid code exists: ");
-            for (int i = code.length-1; i >= 0; i--) {
-                System.out.print(code[i] + " ");
-            }
-        }
+
     }
 }
