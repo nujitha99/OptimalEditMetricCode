@@ -4,37 +4,40 @@ import java.util.*;
 
 public class Main {
 
-    int prevLevel = 0;
-    List<List<String>> foundCodes = new ArrayList<List<String>>();
     HashMap<String, Integer> distancesMap = new HashMap<>();
 
-    public void backtrack(String[] code, List<String>[] candidates, int level, int M, int d) {
-        if (level >= M) {
-            return;
-        }
+    private void backtrack(String[] code, List<String>[] candidates, int level, int M, int d) {
 
-        prevLevel = level;
+        for (String v : candidates[level]) {
 
+            code[level] = v;
+            candidates[level + 1] = new ArrayList<>();
 
-        try {
-            for (String v : candidates[level]) {
-                code[level] = v;
-                candidates[level + 1] = new ArrayList<>();
-                for (String w : candidates[level]) {
-                    if (distancesMap.get(w+v) >= d) {
-                        candidates[level + 1].add(w);
-                    }
+            for (int i = 1; i < candidates[level].size(); i++) {
+                String w = candidates[level].get(i);
+                // Restrict words based on start symbol
+                int x = Math.abs(M / q) + 1;
+                if (String.valueOf(v.charAt(0)).equals("1") && (level+1 < (x))) continue;
+                if (distancesMap.get(w + v) >= d) {
+                    candidates[level + 1].add(w);
                 }
-                if (level < prevLevel) {
-                    foundCodes.add(Arrays.asList(code));
-                    if (foundCodes.size() == 2) checkGeneratedCodes(code);
-                }
+            }
+
+            // Backtrack immediately if not enough candidates are available
+            if (candidates[level+1].size() < M - (level+1)) {
                 backtrack(code, candidates, level + 1, M, d);
             }
-        } catch (ArrayIndexOutOfBoundsException exception) {
-            System.out.println("Invalid bound: Value M needs to be raised" + exception);
-            System.exit(0);
+
+            if (level < M) {
+                backtrack(code, candidates, level + 1, M, d);
+            } else {
+                for (String codew : code) {
+                    System.out.print(codew + " ");
+                }
+                System.out.println();
+            }
         }
+
     }
 
     private List<String> generateAllCodewords(int n, int M, int q) {
@@ -55,6 +58,7 @@ public class Main {
         }
     }
 
+    // Calculate edit distance
     private int calculateEditDistance(String s1, String s2) {
         int m = s1.length();
         int n = s2.length();
@@ -78,7 +82,8 @@ public class Main {
         return dp[m][n];
     }
 
-    private void computeDistances(List<String> codewords){
+    // Pre-compute the edit distances and store in a map
+    private void computeDistances(List<String> codewords) {
         for (String codeword1 : codewords) {
             for (String codeword2 : codewords) {
                 int dist = calculateEditDistance(codeword1, codeword2);
@@ -88,6 +93,7 @@ public class Main {
         }
     }
 
+    // Prints the summary
     private void checkGeneratedCodes(String[] code) {
         if (Arrays.asList(code).contains(null)) {
             int counter = (int) Arrays.stream(code).filter(Objects::nonNull).count();
@@ -95,21 +101,17 @@ public class Main {
                     + counter + " codewords cannot exist");
         } else {
             System.out.println("A valid code exists: ");
-//            for (int i = code.length-1; i >= 0; i--) {
-//                System.out.print(code[i] + " ");
-//            }
-            for (String codew :
-                    code) {
-                System.out.print(codew + " ");
+            for (String word : code) {
+                System.out.print(word + " ");
             }
         }
         System.exit(0);
     }
 
-    static int  n = 10;
+    static int n = 3;
     static int d = 2;
     static int q = 2;
-    static int M = 520;
+    static int M = 4;
 
     public static void main(String[] args) {
         Main test = new Main();
@@ -124,6 +126,6 @@ public class Main {
 
         test.backtrack(code, candidates, 0, M, d);
 
-
+        test.checkGeneratedCodes(code);
     }
 }
