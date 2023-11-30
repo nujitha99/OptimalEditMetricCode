@@ -1,7 +1,5 @@
 import java.util.*;
 
-// TODO: equivalence testing
-
 public class Main {
 
     HashMap<String, Integer> distancesMap = new HashMap<>();
@@ -18,6 +16,7 @@ public class Main {
                 // Restrict words based on start symbol
                 int x = Math.abs(M / q) + 1;
                 if (String.valueOf(v.charAt(0)).equals("1") && (level+1 < (x))) continue;
+                // Check for the edit distance by looking at precomputed values
                 if (distancesMap.get(w + v) >= d) {
                     candidates[level + 1].add(w);
                 }
@@ -108,10 +107,10 @@ public class Main {
         System.exit(0);
     }
 
-    static int n = 3;
-    static int d = 2;
-    static int q = 2;
-    static int M = 4;
+    static int n = 7;
+    static int d = 5;
+    static int q = 3;
+    static int M = 8;
 
     public static void main(String[] args) {
         Main test = new Main();
