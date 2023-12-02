@@ -2,8 +2,10 @@ import java.util.*;
 
 public class Main {
 
+    // HashMap to store the calculated distances
     HashMap<String, Integer> distancesMap = new HashMap<>();
 
+    // Backtracking algorithm
     private void backtrack(String[] code, List<String>[] candidates, int level, int M, int d) {
 
         for (String v : candidates[level]) {
@@ -27,7 +29,7 @@ public class Main {
                 backtrack(code, candidates, level + 1, M, d);
             }
 
-            if (level < M) {
+            if (level < M-1) {
                 backtrack(code, candidates, level + 1, M, d);
             } else {
                 for (String codew : code) {
@@ -39,6 +41,7 @@ public class Main {
 
     }
 
+    // Generates all the codewords for the first level of candidate
     private List<String> generateAllCodewords(int n, int M, int q) {
         List<String> codewords = new ArrayList<>();
         generateCodewords("", n, M, q, codewords);
@@ -86,7 +89,9 @@ public class Main {
         for (String codeword1 : codewords) {
             for (String codeword2 : codewords) {
                 int dist = calculateEditDistance(codeword1, codeword2);
+                // Create String key as a concatenation of the calculated distance
                 String key = codeword1 + codeword2;
+                // Save the calculated distance of the word pair
                 distancesMap.put(key, dist);
             }
         }
@@ -94,37 +99,35 @@ public class Main {
 
     // Prints the summary
     private void checkGeneratedCodes(String[] code) {
-        if (Arrays.asList(code).contains(null)) {
+        if (Arrays.asList(code).contains(null)) { // If M is higher and the code array is empty
             int counter = (int) Arrays.stream(code).filter(Objects::nonNull).count();
             System.out.println("(" + n + ", " + d + ")" + q + " code with more than "
                     + counter + " codewords cannot exist");
-        } else {
-            System.out.println("A valid code exists: ");
-            for (String word : code) {
-                System.out.print(word + " ");
-            }
+        } else { // A valid code exists
+            System.out.println("(" + n + ", " + d + ")" + q + " code with "
+                    + M + " codewords exist");
         }
         System.exit(0);
     }
 
-    static int n = 7;
-    static int d = 5;
-    static int q = 3;
-    static int M = 8;
+    static int n = 2;
+    static int d = 2;
+    static int q = 4;
+    static int M = 4;
 
     public static void main(String[] args) {
         Main test = new Main();
-
+        // Initialize the code and candidates
         String[] code = new String[M];
         List<String>[] candidates = new List[M + 1];
-
+        // Generate all possible codewords
         List<String> generatedCodewords = test.generateAllCodewords(n, M, q);
         candidates[0] = generatedCodewords;
-
+        // Pre-compute the distances
         test.computeDistances(generatedCodewords);
-
+        // Start backtracking
         test.backtrack(code, candidates, 0, M, d);
-
+        // Print the result summary
         test.checkGeneratedCodes(code);
     }
 }
